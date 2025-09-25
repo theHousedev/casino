@@ -23,6 +23,7 @@ class Rank(Enum):
     queen = 12
     king = 13
 
+
 @dataclass
 class Card:
     suit: Suit
@@ -40,12 +41,6 @@ class Card:
         }
         return f"{ranks[self.rank]}{suits[self.suit]}".rjust(3)
 
-@dataclass
-class Hand:
-    cards: list[Card]
-
-    def __str__(self):
-        return "  ".join(str(card) for card in self.cards)
 
 class Deck:
     def __init__(self):
@@ -59,22 +54,27 @@ class Deck:
     def shuffle(self):
         random.shuffle(self.cards)
 
-    def deal(self, to: Hand=None, cards: int=1):
-        dealtCards = []
-        for i in range(cards):
-            dealtCards.append(self.cards.pop(i))
-        if to:
-            to.cards.extend(dealtCards)
-        return dealtCards
+    def deal(self) -> Card:
+        return self.cards.pop()
 
     def size(self):
         return len(self.cards)
 
+
 class Player:
     def __init__(self, index: int):
-        self.hand = Hand(cards=[])
-        self.stack = Hand(cards=[])
+        self.hand = []
+        self.stack = []
         self.i = index
+        self.active = False
+
+    def toggleActive(self):
+        self.active = not self.active
+
+    def showHand(self):
+        handString = "  ".join(str(card) for card in self.hand)
+        return handString
+
 
 class Players:
     def __init__(self, numPlayers: int):
@@ -102,21 +102,13 @@ class Players:
 
 class Game:
     def __init__(self, numPlayers: int):
-        if numPlayers <2 or numPlayers > 4:
-            raise ValueError("Number of players must be 2, 3, or 4")
-        self.players = Players(numPlayers)
         self.deck = Deck()
-        self.table = Hand(cards=[])
+        self.table = []
         self.round = 0
         self.maxRounds = int(12 / numPlayers)
-        self.newRound()
-
-    def newRound(self):
-        self.round += 1
-        for i in self.players.keys():
-            self.deck.deal(to=self.players[i].hand, cards=4)
-        self.deck.deal(to=self.table, cards=4)
-        self.showTable()
+        self.players = Players(numPlayers)
+        self.playerIndex = 1
+        self.activePlayer = self.players[self.playerIndex]
 
     def turn(self, player: Player):
         if self.round > 1:
@@ -124,18 +116,77 @@ class Game:
         self.showPlayer(player)
 
     def showTable(self):
+        tableString = "  ".join(str(card) for card in self.table)
         print("-----------------------------")
-        print(f"Table:     {self.table}")
+        print(f"Table:     {tableString}")
         print("-----------------------------")
+
+    def dealRound(self):
+        for i in range(4):
+            for player in self.players:
+                player.hand.append(self.deck.deal())
+            if self.round == 1:
+                self.table.append(self.deck.deal())
+
+    def newRound(self):
+        self.round += 1
+        self.dealRound()
+        self.showTable()
 
     def showPlayer(self, player: Player):
-        print(f"Player {player.i}:  {player.hand}")
+        print(f"Player {player.i}:  {player.showHand()}")
         print("-----------------------------")
 
+    def activePlayer(self) -> Player:
+        return self.players[self.playerIndex]
+
+    def nextPlayer(self):
+        if self.playerIndex == len(self.players):
+            self.playerIndex = 1
+        else:
+            self.playerIndex += 1
+        self.activePlayer = self.players[self.playerIndex]
+
+    def end(self):
+        print(f"Game over!")
+        # display results: player card counts & captures, scored points
+        print("-----------------------------")
+
+
+def runGame(numPlayers: int):
+
+    # prompt for game start input
+
+    game = Game(numPlayers)
+    
+    while game.deck.size() > 0:
+        game.newRound()
+        while any(player.hand for player in game.players):
+            DEBUG_incrementTurn(game)
+        game.table = []
+    game.end()
+
+    # prompt for game start input with restart=true,
+    # which keeps running total score and number of won games
+    #     save running totals to file (json, yaml?)
+ 
+def DEBUG_incrementTurn(game: Game):
+    if game.round == 1:
+        print(f"[DEBUG] Max rounds: {game.maxRounds}")
+
+    print(f"[DEBUG] Current round: {game.round}")
+    print(f"[DEBUG] Active player: {game.activePlayer.i}")
+    print(f"[DEBUG] Active player hand: {game.activePlayer.showHand()}")
+    print(f"[DEBUG] Remaining cards: {game.deck.size()}")
+    print(f"Press enter to increment turn...")
+    input()
+    game.activePlayer.hand.pop()
+    game.nextPlayer()
+
 def main():
-    game = Game(numPlayers=2)
-    game.turn(game.players[1])
-    game.turn(game.players[2])
+    runGame(numPlayers=2)
+
+
 
 
 if __name__ == "__main__":
