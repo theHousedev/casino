@@ -5,11 +5,7 @@ class Player:
     def __init__(self, index: int):
         self.cards: list[Card] = []
         self.stack: list[Card] = []
-        self.i: int = index
-        self.active: bool = False
-
-    def toggleActive(self):
-        self.active = not self.active
+        self.index: int = index
 
     def showHand(self):
         handString = "  ".join(str(card) for card in self.cards)
@@ -47,10 +43,9 @@ class Game:
         self.round: int = 0
         self.maxRounds: int = int(12 / numPlayers)
         self.players: Players = Players(numPlayers)
-        self.playerIndex: int = 1
-        self.activePlayer: Player = self.players[self.playerIndex] # type: ignore
+        self.activePlayerIndex: int = 1
 
-    def turn(self, player: Player):
+    def playTurn(self, player: Player):
         if self.round > 1:
             self.showTable()
         self.showPlayer(player)
@@ -74,18 +69,19 @@ class Game:
         self.showTable()
 
     def showPlayer(self, player: Player):
-        print(f"Player {player.i}:  {player.showHand()}")
+        print(f"Player {player.index}:  {player.showHand()}")
         print("-----------------------------")
+        
+    def isActivePlayer(self, player: Player) -> bool:
+        return player.index == self.activePlayerIndex
 
     def getActivePlayer(self) -> Player:
-        return self.players[self.playerIndex] # type: ignore
+        return self.players[self.activePlayerIndex]
 
-    def nextPlayer(self):
-        if self.playerIndex == len(self.players):
-            self.playerIndex = 1
-        else:
-            self.playerIndex += 1
-        self.activePlayer = self.players[self.playerIndex] # type: ignore
+    def nextPlayer(self) -> Player:
+        if self.activePlayerIndex == len(self.players):
+            return self.players[1]
+        return self.players[self.activePlayerIndex + 1]
 
     def end(self):
         print(f"Game over!")
