@@ -1,12 +1,15 @@
 import random
 from enum import Enum
+from typing import override
 from dataclasses import dataclass
+
 
 class Suit(Enum):
     spade = 1   # ♠
     heart = 2   # ♥
     club = 3    # ♣
-    diamond = 4 # ♦
+    diamond = 4  # ♦
+
 
 class Rank(Enum):
     ace = 1
@@ -29,6 +32,7 @@ class Card:
     suit: Suit
     rank: Rank
 
+    @override
     def __str__(self):
         ranks = {
             Rank.ace: "A", Rank.two: "2", Rank.three: "3", Rank.four: "4",
@@ -44,7 +48,7 @@ class Card:
 
 class Deck:
     def __init__(self):
-        self.cards = []
+        self.cards: list[Card] = []
 
         for suit in Suit:
             for rank in Rank:
@@ -63,10 +67,10 @@ class Deck:
 
 class Player:
     def __init__(self, index: int):
-        self.hand = []
-        self.stack = []
-        self.i = index
-        self.active = False
+        self.hand: list[Card] = []
+        self.stack: list[Card] = []
+        self.i: int = index
+        self.active: bool = False
 
     def toggleActive(self):
         self.active = not self.active
@@ -78,7 +82,7 @@ class Player:
 
 class Players:
     def __init__(self, numPlayers: int):
-        self._players = {}
+        self._players: dict[int, Player] = {}
         for i in range(1, numPlayers + 1):
             self._players[i] = Player(index=i)
 
@@ -89,26 +93,26 @@ class Players:
 
     def __len__(self):
         return len(self._players)
-    
+
     def __iter__(self):
         return iter(self._players.values())
-    
+
     def keys(self):
         return self._players.keys()
-    
+
     def values(self):
         return self._players.values()
 
 
 class Game:
     def __init__(self, numPlayers: int):
-        self.deck = Deck()
-        self.table = []
-        self.round = 0
-        self.maxRounds = int(12 / numPlayers)
-        self.players = Players(numPlayers)
-        self.playerIndex = 1
-        self.activePlayer = self.players[self.playerIndex]
+        self.deck: Deck = Deck()
+        self.table: list[Card] = []
+        self.round: int = 0
+        self.maxRounds: int = int(12 / numPlayers)
+        self.players: Players = Players(numPlayers)
+        self.playerIndex: int = 1
+        self.activePlayer: Player = self.players[self.playerIndex]
 
     def turn(self, player: Player):
         if self.round > 1:
@@ -137,7 +141,7 @@ class Game:
         print(f"Player {player.i}:  {player.showHand()}")
         print("-----------------------------")
 
-    def activePlayer(self) -> Player:
+    def getActivePlayer(self) -> Player:
         return self.players[self.playerIndex]
 
     def nextPlayer(self):
@@ -158,7 +162,7 @@ def runGame(numPlayers: int):
     # prompt for game start input
 
     game = Game(numPlayers)
-    
+
     while game.deck.size() > 0:
         game.newRound()
         while any(player.hand for player in game.players):
@@ -169,27 +173,25 @@ def runGame(numPlayers: int):
     # prompt for game start input with restart=true,
     # which keeps running total score and number of won games
     #     save running totals to file (json, yaml?)
- 
+
+
 def DEBUG_incrementTurn(game: Game):
     if game.round == 1:
         print(f"[DEBUG] Max rounds: {game.maxRounds}")
 
     print(f"[DEBUG] Current round: {game.round}")
-    print(f"[DEBUG] Active player: {game.activePlayer.i}")
+    print(f"[DEBUG] Active player: {game.getActivePlayer().i}")
     print(f"[DEBUG] Active player hand: {game.activePlayer.showHand()}")
     print(f"[DEBUG] Remaining cards: {game.deck.size()}")
     print(f"Press enter to increment turn...")
-    input()
-    game.activePlayer.hand.pop()
+    _ = input()
+    _ = game.activePlayer.hand.pop()
     game.nextPlayer()
 
+
 def main():
-    runGame(numPlayers=2)
-
-
+    runGame(numPlayers=4)
 
 
 if __name__ == "__main__":
     main()
-
-
