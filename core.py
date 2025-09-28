@@ -11,6 +11,9 @@ class Player:
         handString = "  ".join(str(card) for card in self.cards)
         return handString
 
+    def hasCards(self) -> bool:
+        return len(self.cards) > 0
+
 
 class Players:
     def __init__(self, numPlayers: int):
@@ -48,7 +51,10 @@ class Game:
     def playTurn(self, player: Player):
         if self.round > 1:
             self.showTable()
-        self.showPlayer(player)
+
+        card = player.cards.pop()
+        print(f"> {card} played\n")
+        self.activePlayerIndex = self.getNextPlayer().index
 
     def showTable(self):
         tableString = "  ".join(str(card) for card in self.table)
@@ -70,7 +76,6 @@ class Game:
 
     def showPlayer(self, player: Player):
         print(f"Player {player.index}:  {player.showHand()}")
-        print("-----------------------------")
         
     def isActivePlayer(self, player: Player) -> bool:
         return player.index == self.activePlayerIndex
@@ -78,7 +83,7 @@ class Game:
     def getActivePlayer(self) -> Player:
         return self.players[self.activePlayerIndex]
 
-    def nextPlayer(self) -> Player:
+    def getNextPlayer(self) -> Player:
         if self.activePlayerIndex == len(self.players):
             return self.players[1]
         return self.players[self.activePlayerIndex + 1]

@@ -5,6 +5,10 @@ from models import Suit, Rank, Card, Deck
 
 def runGame(numPlayers: int):
 
+    print(f"Starting game with {numPlayers} players")
+    print(f"Press enter to start...")
+    _ = input()
+
     # prompt for game start input
 
     game = Game(numPlayers)
@@ -20,19 +24,15 @@ def runGame(numPlayers: int):
     # which keeps running total score and number of won games
     #     save running totals to file (json, yaml?)
 
-
 def DEBUG_incrementTurn(game: Game):
-    if game.round == 1:
-        print(f"[DEBUG] Max rounds: {game.maxRounds}")
-
-    print(f"[DEBUG] Current round: {game.round}")
-    print(f"[DEBUG] Active player: {game.getActivePlayer().i}")
-    print(f"[DEBUG] Active player hand: {game.getActivePlayer().showHand()}")
-    print(f"[DEBUG] Remaining cards: {game.deck.size()}")
-    print(f"Press enter to increment turn...")
+    print(f"[DEBUG] Round: {game.round}")
+    print(f"[DEBUG] Player: {game.getActivePlayer().index}")
+    print(f"[DEBUG] Hand: {game.getActivePlayer().showHand()}")
+    print(f"[DEBUG] Deck: {game.deck.size()}")
+    print(f"Press enter to play turn...")
     _ = input()
-    _ = game.getActivePlayer().cards.pop()
-    game.nextPlayer()
+
+    game.playTurn(game.getActivePlayer())
 
 
 def main():
