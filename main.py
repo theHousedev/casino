@@ -1,6 +1,6 @@
 import random
-from gamelogic import Game
-from data import Suit, Rank, Card, Deck
+from core import Game
+from models import Suit, Rank, Card, Deck
 
 
 def runGame(numPlayers: int):

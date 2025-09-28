@@ -1,4 +1,4 @@
-from data import Card, Deck
+from models import Card, Deck
 
 
 class Player:
