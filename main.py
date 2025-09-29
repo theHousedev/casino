@@ -33,6 +33,7 @@ def DEBUG_incrementTurn(game: Game):
     _ = input()
 
     game.playTurn(game.getActivePlayer())
+    game.nextPlayer()
 
 
 def main():

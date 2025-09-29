@@ -52,9 +52,34 @@ class Game:
         if self.round > 1:
             self.showTable()
 
+        # card selection
+        # tester with hardcoded card
+        playedCard = player.cards[-1]
+
+        # card capture (simple 1:1)
+        capturedCards: list[Card] = []
+        for tableCard in self.table:
+            if tableCard.rank == playedCard.rank:
+                capturedCards.append(tableCard)
+                self.table.remove(tableCard)
+
+        if capturedCards:
+            for card in capturedCards:
+                player.stack.append(card)
+            player.stack.append(playedCard)
+            print(f"Collected: {', '.join(str(c) for c in capturedCards)}")
+        else:
+            self.table.append(playedCard)
+            print(f"Trailed {playedCard} to table")
+
         card = player.cards.pop()
         print(f"> {card} played\n")
-        self.activePlayerIndex = self.getNextPlayer().index
+    
+    def nextPlayer(self):
+        if self.activePlayerIndex == len(self.players):
+            self.activePlayerIndex = 1
+        else:
+            self.activePlayerIndex += 1
 
     def showTable(self):
         tableString = "  ".join(str(card) for card in self.table)
@@ -82,11 +107,6 @@ class Game:
 
     def getActivePlayer(self) -> Player:
         return self.players[self.activePlayerIndex]
-
-    def getNextPlayer(self) -> Player:
-        if self.activePlayerIndex == len(self.players):
-            return self.players[1]
-        return self.players[self.activePlayerIndex + 1]
 
     def end(self):
         print(f"Game over!")
