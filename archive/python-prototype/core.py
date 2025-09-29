@@ -48,15 +48,20 @@ class Game:
         self.players: Players = Players(numPlayers)
         self.activePlayerIndex: int = 1
 
+    def showTable(self):
+        tableString = "  ".join(str(card) for card in self.table)
+        print("-----------------------------")
+        print(f"Table:     {tableString}")
+        print("-----------------------------")
+
     def playTurn(self, player: Player):
-        if self.round > 1:
-            self.showTable()
+        self.showTable()
 
-        # card selection
-        # tester with hardcoded card
-        playedCard = player.cards[-1]
+        # TODO: need to build actual interactive card selector
+        playedCard = player.cards.pop()
+        print(f"> {playedCard}")
 
-        # card capture (simple 1:1)
+        # TODO: card capture (simple 1:1 for now)
         capturedCards: list[Card] = []
         for tableCard in self.table:
             if tableCard.rank == playedCard.rank:
@@ -67,25 +72,18 @@ class Game:
             for card in capturedCards:
                 player.stack.append(card)
             player.stack.append(playedCard)
-            print(f"Collected: {', '.join(str(c) for c in capturedCards)}")
+            print(f"Collected: {', '.join(str(c) for c in capturedCards)}") # DEBUG:
         else:
             self.table.append(playedCard)
-            print(f"Trailed {playedCard} to table")
+            print(f"Trailed {playedCard} to table") # DEBUG:
 
-        card = player.cards.pop()
-        print(f"> {card} played\n")
-    
+        self.showTable()
+
     def nextPlayer(self):
         if self.activePlayerIndex == len(self.players):
             self.activePlayerIndex = 1
         else:
             self.activePlayerIndex += 1
-
-    def showTable(self):
-        tableString = "  ".join(str(card) for card in self.table)
-        print("-----------------------------")
-        print(f"Table:     {tableString}")
-        print("-----------------------------")
 
     def dealRound(self):
         for i in range(4):
@@ -97,10 +95,9 @@ class Game:
     def newRound(self):
         self.round += 1
         self.dealRound()
-        self.showTable()
 
     def showPlayer(self, player: Player):
-        print(f"Player {player.index}:  {player.showHand()}")
+        print(f"Player {player.index}:  {player.showHand()}") # DEBUG:
         
     def isActivePlayer(self, player: Player) -> bool:
         return player.index == self.activePlayerIndex
@@ -110,4 +107,11 @@ class Game:
 
     def end(self):
         print(f"Game over!")
+        # TODO: calculate player scores.
+        # for now just printing stacks:
+        for i, p in enumerate(self.players):
+            print("-----------------------------")
+            print(f"Player {i} stack:")
+            stackStr = ",".join(str(card) for card in p.stack)
+            print(stackStr)
         print("-----------------------------")
