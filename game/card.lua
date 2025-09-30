@@ -33,6 +33,10 @@ function Card:new(suit, rank)
 	return card
 end
 
+function Card.filter(cards, targetSuit, targetRank)
+	-- TODO: write filter func for card utilities
+end
+
 function Card:__tostring()
 	local rankSymbols = {
 		[1] = "A",

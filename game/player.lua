@@ -1,3 +1,7 @@
+local cardModule = require("game.card")
+local Card = cardModule.Card
+local Suit = cardModule.Suit
+local Rank = cardModule.Rank
 --[[
 
 =================================================================
@@ -40,16 +44,41 @@ function Player:capture(cards)
 	table.insert(self.stack, cards)
 end
 
-function Player:reset()
-	self.hand = {}
-	self.stack = {}
-	self.isActive = false
+function Player:countAces()
+	-- TODO: rank + suit filter helper func?
+	-- could be reused for capture/stack logic
+end
+
+function Player:countCards()
+	return #self.stack
+end
+
+function Player:countSpades()
+	local spadeCount = 0
+
+	for _, card in ipairs(self.stack) do
+		if card.Suit == Suit.Spade then
+			spadeCount = spadeCount + 1
+		end
+	end
+
+	return spadeCount
 end
 
 function Player:calcScore()
 	local score = 0
-	local totalCards = self:getStackSize()
-	local totalSpades = self:getStackSpades()
+
+	local aces = self:countAces()
+	local cards = self:countCards()
+	local spades = self:countSpades()
+	local big = self:hasBigCasino()
+	local little = self:hasLittleCasino()
+end
+
+function Player:reset()
+	self.hand = {}
+	self.stack = {}
+	self.isActive = false
 end
 
 -- for log/debug purposes
