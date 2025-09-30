@@ -11,7 +11,6 @@ Player Class
 TODO:
   + add name field? leans towards multiplayer, "login", etc
   + persistent score tracking long-term, stats, etc
-  + custom layout config saving
 
 --]]
 
@@ -39,6 +38,18 @@ end
 
 function Player:capture(cards)
 	table.insert(self.stack, cards)
+end
+
+function Player:reset()
+	self.hand = {}
+	self.stack = {}
+	self.isActive = false
+end
+
+function Player:calcScore()
+	local score = 0
+	local totalCards = self:getStackSize()
+	local totalSpades = self:getStackSpades()
 end
 
 -- for log/debug purposes
