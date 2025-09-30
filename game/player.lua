@@ -11,6 +11,7 @@ Player Class
 TODO:
   + add name field? leans towards multiplayer, "login", etc
   + persistent score tracking long-term, stats, etc
+  + custom layout config saving
 
 --]]
 
