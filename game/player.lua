@@ -1,22 +1,20 @@
 local cardModule = require("game.card")
 local Card = cardModule.Card
+local Cards = cardModule.Cards
 local Suit = cardModule.Suit
 local Rank = cardModule.Rank
---[[
-
-=================================================================
+--[[================================================================
 Player Class
   + hasCards: bool
   + play: Card
   + capture (none, adds to 'stack' table)
   + debugShowHand: string
 
-=================================================================
-TODO:
-  + add name field? leans towards multiplayer, "login", etc
-  + persistent score tracking long-term, stats, etc
+================================================================--]]
+-- TODO:
+-- add name field? leans towards multiplayer, "login", etc
+-- persistent score tracking long-term, stats, etc
 
---]]
 
 local Player = {}
 Player.__index = Player
@@ -24,60 +22,53 @@ Player.__index = Player
 function Player:new(index)
 	local player = {
 		index = index,
-		hand = {},
-		stack = {},
+		hand = Cards.new({}),
+		stack = Cards.new({}),
 	}
 	setmetatable(player, Player)
 
 	return player
 end
 
-function Player:hasCards()
-	return #self.hand > 0
+function Player:hasStack()
+	return self.stack:hasCards()
+end
+
+function Player:hasHand()
+	return self.hand:hasCards()
 end
 
 function Player:play(index)
-	return table.remove(self.hand, index)
+	return self.hand:remove(index)
 end
 
 function Player:capture(cards)
-	table.insert(self.stack, cards)
+	self.stack:add(cards)
 end
 
-function Player:countAces()
-	-- TODO: rank + suit filter helper func?
-	-- could be reused for capture/stack logic
+function Player:hasBigCasino()
+	bigCasino = Card.new(Rank.Ten, Suit.Diamond)
+	return
 end
 
-function Player:countCards()
-	return #self.stack
-end
-
-function Player:countSpades()
-	local spadeCount = 0
-
-	for _, card in ipairs(self.stack) do
-		if card.Suit == Suit.Spade then
-			spadeCount = spadeCount + 1
-		end
-	end
-
-	return spadeCount
+function Player:hasLittleCasino()
+	return self.stack:count(Rank.Two, Suit.Spade) >= 2
 end
 
 function Player:calcScore()
 	local score = 0
 
-	local aces = self:countAces()
-	local cards = self:countCards()
-	local spades = self:countSpades()
+	local cards = self.stack:count()
+	local aces = self.stack:count(nil, Rank.Ace)
+	local spades = self.stack:count(Suit.Spade, nil)
+
 	local big = self:hasBigCasino()
 	local little = self:hasLittleCasino()
 end
 
 function Player:reset()
-	self.hand = {}
-	self.stack = {}
+	self.hand = Cards.new({})
+	self.stack = Cards.new({})
 	self.isActive = false
 end
 
