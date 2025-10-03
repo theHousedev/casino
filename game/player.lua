@@ -15,7 +15,6 @@ Player Class
 -- add name field? leans towards multiplayer, "login", etc
 -- persistent score tracking long-term, stats, etc
 
-
 local Player = {}
 Player.__index = Player
 
@@ -47,23 +46,41 @@ function Player:capture(cards)
 end
 
 function Player:hasBigCasino()
-	bigCasino = Card.new(Rank.Ten, Suit.Diamond)
-	return
+	return self.stack:hasCards(Card.new(Rank.Ten, Suit.Diamond))
 end
 
 function Player:hasLittleCasino()
-	return self.stack:count(Rank.Two, Suit.Spade) >= 2
+	return self.stack:hasCards(Card.new(Rank.Two, Suit.Spade))
 end
 
 function Player:calcScore()
 	local score = 0
 
 	local cards = self.stack:count()
-	local aces = self.stack:count(nil, Rank.Ace)
-	local spades = self.stack:count(Suit.Spade, nil)
+	if cards > 26 then
+		score = score + 3
+	end
 
-	local big = self:hasBigCasino()
-	local little = self:hasLittleCasino()
+	local aces = self.stack:count(nil, Rank.Ace)
+	if aces ~= nil then
+		score = score + aces
+	end
+
+	local spades = self.stack:count(Suit.Spade, nil)
+	if spades ~= nil then
+		-- TODO: check spades val > othPlayers:spades()
+		score = score + spades
+	end
+
+	if self:hasBigCasino() then
+		score = score + 2
+	end
+
+	if self:hasLittleCasino() then
+		score = score + 1
+	end
+
+	return score
 end
 
 function Player:reset()
