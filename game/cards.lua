@@ -98,7 +98,10 @@ function Card:__tostring()
 		[4] = "♦",
 	}
 
-	return rankSymbols[self.rank] .. suitSymbols[self.suit]
+	local rankStr = rankSymbols[self.rank]
+	local suitStr = suitSymbols[self.suit]
+
+	return rankStr .. suitStr
 end
 
 local Cards = {}

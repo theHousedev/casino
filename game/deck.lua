@@ -1,4 +1,4 @@
-local cardModule = require("game.card")
+local cardModule = require("game.cards")
 local Card = cardModule.Card
 local Suit = cardModule.Suit
 local Rank = cardModule.Rank
@@ -14,7 +14,7 @@ function Deck:new()
 
 	for suit = 1, 4 do
 		for rank = 1, 13 do
-			table.insert(deck.cards, Card:new(suit, rank))
+			table.insert(deck.cards, Card:new(rank, suit))
 		end
 	end
 
